@@ -3,3 +3,4 @@ __pycache__/
 *.pyc 
 .env 
 models/Mistral-7B-Instruct-v0.3.Q5_K_M.gguf
+test.py
