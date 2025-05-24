@@ -1,5 +1,4 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import PlainTextResponse
+from fastapi import FastAPI
 from langchain_community.vectorstores import FAISS
 from langchain_community.document_loaders import TextLoader
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -12,12 +11,6 @@ import requests
 import os
 
 app = FastAPI()
-
-@app.middleware("http")
-async def root_override(request: Request, call_next):
-    if request.url.path == "/":
-        return PlainTextResponse("Hello! This AI is under development :)")
-    return await call_next(request)
 
 model_path = "/persistent-models/Mistral-7B-Instruct-v0.3.Q4_K_M.gguf"
 if not os.path.exists(model_path):
@@ -56,6 +49,20 @@ def send_discord_log(message: str):
 class QueryRequest(BaseModel):
     query: str
 
+def truncate_text(text, max_chars=500):
+    if len(text) <= max_chars:
+        return text
+    truncated = text[:max_chars]
+    last_period = truncated.rfind('.')
+    if last_period != -1:
+        return truncated[:last_period+1]
+    return truncated
+
+SYSTEM_PROMPT = (
+    "You are a helpful assistant. Answer concisely and only the user's query. "
+    "Do not add unrelated code snippets or documentation unless asked."
+)
+
 @app.on_event("startup")
 def load_documents_from_docs_folder():
     global vector_store, retriever
@@ -69,7 +76,6 @@ def load_documents_from_docs_folder():
                 try:
                     documents = loader.load()
                     all_documents.extend(documents)
-                    send_discord_log(f"📄 Loaded: {file}")
                 except Exception as e:
                     send_discord_log(f"❌ Failed loading {file}: {e}")
 
@@ -79,6 +85,10 @@ def load_documents_from_docs_folder():
         retriever = vector_store.as_retriever()
         send_discord_log(f"✅ Indexed {len(all_documents)} .md files from docs/")
 
+@app.get("/")
+async def homepage(request: QueryRequest):
+    return {"success": True}
+
 @app.post("/ask")
 async def ask_question(request: QueryRequest):
     send_discord_log("Received request.")
@@ -86,14 +96,18 @@ async def ask_question(request: QueryRequest):
         send_discord_log("⚠️ Tried asking but no documents indexed.")
         return {"error": "No documents indexed"}
 
+    prompt = SYSTEM_PROMPT + "\nUser: " + request.query + "\nAssistant:"
+
     qa = RetrievalQA.from_chain_type(
         llm=llm,
         retriever=retriever,
         chain_type="stuff",
-        return_source_documents=True
+        return_source_documents=True,
     )
-    result = qa.invoke({"query": request.query})
+    result = qa.invoke({"query": prompt})
     answer = result.get("result", None)
+    if answer:
+        answer = truncate_text(answer, max_chars=500)
 
     send_discord_log(f"📨 Query: {request.query}\n💬 Answer: {answer}")
     return {"answer": answer}
