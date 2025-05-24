@@ -47,8 +47,8 @@ try:
     llm = LlamaCpp(
         model_path=model_path,
         n_ctx=4096,
-        n_batch=512,
-        n_gpu_layers=50,
+        n_batch=8,
+        n_gpu_layers=0,
         n_threads=4,
         temperature=0.1
     )
@@ -56,7 +56,6 @@ try:
 except Exception as e:
     send_discord_log(f"❌ LlamaCpp load failed: {e}")
     raise
-
 try:
     text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
