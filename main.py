@@ -15,8 +15,7 @@ app = FastAPI()
 path = hf_hub_download(
     repo_id="MaziyarPanahi/Mistral-7B-Instruct-v0.3-GGUF",
     filename="Mistral-7B-Instruct-v0.3.Q5_K_M.gguf",
-    local_dir="models",
-    local_dir_use_symlinks=False
+    local_dir="models"
 )
 
 llm = LlamaCpp(
