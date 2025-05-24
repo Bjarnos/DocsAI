@@ -10,6 +10,8 @@ from huggingface_hub import hf_hub_download
 import requests
 import os
 
+print("Starting...", flush=True)
+
 app = FastAPI()
 
 model_path = "/persistent-models/Mistral-7B-Instruct-v0.3.Q4_K_M.gguf"
@@ -30,6 +32,8 @@ llm = LlamaCpp(
     n_threads=4,
     temperature=0.1
 )
+
+print("AI set up!", flush=True)
 
 text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
 embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
