@@ -73,7 +73,7 @@ try:
         n_batch=8,
         n_gpu_layers=0,
         n_threads=4,
-        temperature=0.1
+        temperature=0.7
     )
     send_discord_log("✅ LlamaCpp initialized.")
 except Exception as e:
@@ -167,7 +167,7 @@ async def ask_question(request: Request, query: QueryRequest):
             chain_type="stuff",
             return_source_documents=True,
         )
-        result = qa.invoke({"query": prompt})
+        result = qa.invoke({"query": query.query})
         answer = result.get("result", None)
         send_discord_log(f"📨 Query: {query.query}\n💬 Answer: {answer}")
 
