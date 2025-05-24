@@ -10,8 +10,6 @@ from huggingface_hub import hf_hub_download
 import requests
 import os
 
-print("Starting...", flush=True)
-
 app = FastAPI()
 
 model_path = "/persistent-models/Mistral-7B-Instruct-v0.3.Q4_K_M.gguf"
@@ -32,8 +30,6 @@ llm = LlamaCpp(
     n_threads=4,
     temperature=0.1
 )
-
-print("AI set up!", flush=True)
 
 text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
 embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
@@ -69,6 +65,8 @@ SYSTEM_PROMPT = (
 
 @app.on_event("startup")
 def load_documents_from_docs_folder():
+    print("Starting...", flush=True)
+    
     global vector_store, retriever
     all_documents = []
 
@@ -88,6 +86,9 @@ def load_documents_from_docs_folder():
         vector_store = FAISS.from_documents(texts, embedding_model)
         retriever = vector_store.as_retriever()
         send_discord_log(f"✅ Indexed {len(all_documents)} .md files from docs/")
+        print(f"✅ Indexed {len(all_documents)} .md files from docs/", flush=True)
+
+    print("AI set up!", flush=True)
 
 @app.get("/")
 async def homepage():
