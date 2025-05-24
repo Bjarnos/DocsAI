@@ -86,7 +86,7 @@ def load_documents_from_docs_folder():
         send_discord_log(f"✅ Indexed {len(all_documents)} .md files from docs/")
 
 @app.get("/")
-async def homepage(request: QueryRequest):
+async def homepage():
     return {"success": True}
 
 @app.post("/ask")
