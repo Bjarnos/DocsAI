@@ -19,11 +19,11 @@ async def root_override(request: Request, call_next):
         return PlainTextResponse("Hello! This AI is under development :)")
     return await call_next(request)
 
-model_path = "/persistent-models/Mistral-7B-Instruct-v0.3.Q5_K_M.gguf"
+model_path = "/persistent-models/Mistral-7B-Instruct-v0.3.Q4_K_M.gguf"
 if not os.path.exists(model_path):
     path = hf_hub_download(
         repo_id="MaziyarPanahi/Mistral-7B-Instruct-v0.3-GGUF",
-        filename="Mistral-7B-Instruct-v0.3.Q5_K_M.gguf",
+        filename="Mistral-7B-Instruct-v0.3.Q4_K_M.gguf",
         local_dir="/persistent-models"
     )
 else:
