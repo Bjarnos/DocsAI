@@ -27,12 +27,12 @@ def send_discord_log(message: str):
 send_discord_log("🚀 Starting server setup...")
 
 try:
-    model_path = "/persistent-models/Mistral-7B-Instruct-v0.3.Q4_K_M.gguf"
+    model_path = "/persistent-models/Mistral-3B-Instruct-v0.2-init.Q8_0.gguf"
     if not os.path.exists(model_path):
         send_discord_log("📥 Model not found, downloading from Hugging Face...")
         model_path = hf_hub_download(
-            repo_id="MaziyarPanahi/Mistral-7B-Instruct-v0.3-GGUF",
-            filename="Mistral-7B-Instruct-v0.3.Q4_K_M.gguf",
+            repo_id="DavidAU/Mistral-3B-Instruct-v0.2-init-Q8_0-GGUF",
+            filename="mistral-3b-instruct-v0.2-init.Q8_0.gguf",
             local_dir="/persistent-models"
         )
         send_discord_log("✅ Model downloaded.")
@@ -69,15 +69,6 @@ except Exception as e:
 
 class QueryRequest(BaseModel):
     query: str
-
-def truncate_text(text, max_chars=500):
-    if len(text) <= max_chars:
-        return text
-    truncated = text[:max_chars]
-    last_period = truncated.rfind('.')
-    if last_period != -1:
-        return truncated[:last_period+1]
-    return truncated
 
 SYSTEM_PROMPT = (
     "You are a helpful assistant. Answer concisely and only the user's query. "
@@ -146,8 +137,6 @@ async def ask_question(request: QueryRequest):
         )
         result = qa.invoke({"query": prompt})
         answer = result.get("result", None)
-        if answer:
-            answer = truncate_text(answer, max_chars=500)
         send_discord_log(f"📨 Query: {request.query}\n💬 Answer: {answer}")
         return {"answer": answer}
     except Exception as e:
