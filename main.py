@@ -27,7 +27,7 @@ llm = LlamaCpp(
     n_ctx=4096,
     n_batch=512,
     n_gpu_layers=50,
-    n_threads=8,
+    n_threads=4,
     temperature=0.1
 )
 
