@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import PlainTextResponse
 from langchain_community.vectorstores import FAISS
 from langchain_community.document_loaders import TextLoader
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -11,6 +12,12 @@ import requests
 import os
 
 app = FastAPI()
+
+@app.middleware("http")
+async def root_override(request: Request, call_next):
+    if request.url.path == "/":
+        return PlainTextResponse("Hello! This AI is under development :)")
+    return await call_next(request)
 
 model_path = "/persistent-models/Mistral-7B-Instruct-v0.3.Q5_K_M.gguf"
 if not os.path.exists(model_path):
