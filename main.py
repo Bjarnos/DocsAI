@@ -22,14 +22,19 @@ if not os.path.exists(model_path):
 else:
     path = model_path
 
-llm = LlamaCpp(
-    model_path=path,
-    n_ctx=4096,
-    n_batch=512,
-    n_gpu_layers=50,
-    n_threads=4,
-    temperature=0.1
-)
+try:
+    llm = LlamaCpp(
+        model_path=path,
+        n_ctx=4096,
+        n_batch=512,
+        n_gpu_layers=50,
+        n_threads=4,
+        temperature=0.1
+    )
+except Exception as e:
+    print(f"LlamaCpp load failed: {e}", flush=True)
+    send_discord_log(f"LlamaCpp load failed: {e}")
+    raise
 
 text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
 embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
@@ -37,6 +42,8 @@ vector_store = None
 retriever = None
 
 DISCORD_WEBHOOK_URL = os.getenv("WEBHOOK")
+if not DISCORD_WEBHOOK_URL:
+    print("❌ WEBHOOK environment variable is not set", flush=True)
 
 def send_discord_log(message: str):
     if not DISCORD_WEBHOOK_URL:
@@ -93,6 +100,10 @@ def load_documents_from_docs_folder():
 @app.get("/")
 async def homepage():
     return {"success": True}
+
+@app.get("/ping")
+async def ping():
+    return {"pong": True}
 
 @app.post("/ask")
 async def ask_question(request: QueryRequest):
