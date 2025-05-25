@@ -178,7 +178,7 @@ async def ask_question(request: Request, query: QueryRequest):
             chain_type="stuff",
             chain_type_kwargs={"prompt": QA_PROMPT}
         )
-        answer = qa.invoke({"query": query.query}).get('result', 'No answer found')
+        answer = qa.invoke({"query": query.query}).get('result', 'Internal error')
         send_discord_log(f"📨 Query: {query.query}\n💬 Answer: {answer}")
 
         rate_limits[client_ip].append(time.time())
