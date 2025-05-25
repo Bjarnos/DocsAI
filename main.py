@@ -4,7 +4,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_community.document_loaders import TextLoader
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.chains.combine_documents import create_retrieval_chain
+from langchain.chains import create_retrieval_chain
 from langchain.prompts import PromptTemplate
 from langchain_community.llms import LlamaCpp
 from pydantic import BaseModel
