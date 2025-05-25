@@ -101,9 +101,9 @@ class QueryRequest(BaseModel):
 QA_PROMPT = PromptTemplate(
     input_variables=["context", "question"],
     template=(
-        "You are a helpful assistant. Answer concisely and only the user's question. "
+        "You are a helpful assistant. Answer concisely and ONLY the user's question. "
         "Shorter answers are better. "
-        "Do NOT include any code snippets, extra formatting, or unrelated information.\n\n"
+        "Do NOT include any code snippets, extra formatting, or unrelated information, unless SPECIFICALLY asked.\n\n"
         "Context:\n{context}\n\n"
         "Question:\n{question}\n\n"
         "Answer:"
