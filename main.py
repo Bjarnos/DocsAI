@@ -55,12 +55,12 @@ app.add_middleware(
 send_discord_log("🚀 Starting server setup...")
 
 try:
-    model_path = "/persistent-models/Mistral-3B-Instruct-v0.2-init.Q8_0.gguf"
+    model_path = "/persistent-models/mistral-7b-instruct-v0.1.Q4_K_M.gguf"
     if not os.path.exists(model_path):
         send_discord_log("📥 Model not found, downloading from Hugging Face...")
         model_path = hf_hub_download(
-            repo_id="DavidAU/Mistral-3B-Instruct-v0.2-init-Q8_0-GGUF",
-            filename="mistral-3b-instruct-v0.2-init.Q8_0.gguf",
+            repo_id="TheBloke/Mistral-7B-Instruct-v0.1-GGUF",
+            filename="mistral-7b-instruct-v0.1.Q4_K_M.gguf",
             local_dir="/persistent-models"
         )
         send_discord_log("✅ Model downloaded.")
@@ -106,7 +106,8 @@ SYSTEM_PROMPT = (
 QA_PROMPT = PromptTemplate(
     input_variables=["context", "question"],
     template=(
-        "Answer the question based on the context below.\n\n"
+        "You are a helpful assistant. Answer concisely and only the user's query. "
+        "Do not add unrelated code snippets or documentation unless asked.\n\n"
         "Context:\n{context}\n\n"
         "Question:\n{question}\n\n"
         "Answer:"
@@ -174,8 +175,6 @@ async def ask_question(request: Request, query: QueryRequest):
     if retriever is None:
         send_discord_log("⚠️ Tried asking but no documents indexed.")
         return {"error": "No documents indexed"}
-
-    prompt = SYSTEM_PROMPT + "\nUser: " + query.query + "\nAssistant:"
     try:
         qa = RetrievalQA.from_chain_type(
             llm=llm,
