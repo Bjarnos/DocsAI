@@ -4,9 +4,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_community.document_loaders import TextLoader
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.chains import RetrievalQA
-from langchain.chains import LLMChain
-from langchain.chains.qa_with_sources import load_qa_with_sources_chain
+from langchain.chains.combine_documents import create_retrieval_chain
 from langchain.prompts import PromptTemplate
 from langchain_community.llms import LlamaCpp
 from pydantic import BaseModel
@@ -174,13 +172,7 @@ async def ask_question(request: Request, query: QueryRequest):
         send_discord_log("⚠️ Tried asking but no documents indexed.")
         return {"error": "No documents indexed"}
     try:
-        combine_documents_chain = LLMChain(llm=llm, prompt=QA_PROMPT)
-
-        qa = RetrievalQA(
-            retriever=retriever,
-            combine_documents_chain=combine_documents_chain,
-            return_source_documents=False
-        )
+        qa = create_retrieval_chain(retriever=retriever, llm=llm, prompt=QA_PROMPT)
         result = qa.invoke({"query": query.query})
         answer = str(result)
         send_discord_log(f"📨 Query: {query.query}\n💬 Answer: {answer}")
