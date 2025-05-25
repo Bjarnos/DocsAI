@@ -181,8 +181,8 @@ async def ask_question(request: Request, query: QueryRequest):
             combine_documents_chain=combine_documents_chain,
             return_source_documents=False
         )
-        result = qa.invoke({"context": "", "question": query.query})
-        answer = result.get("result", None)
+        result = qa.invoke({"query": query.query})
+        answer = str(result)
         send_discord_log(f"📨 Query: {query.query}\n💬 Answer: {answer}")
 
         rate_limits[client_ip].append(time.time())
