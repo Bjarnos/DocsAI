@@ -55,12 +55,12 @@ app.add_middleware(
 send_discord_log("🚀 Starting server setup...")
 
 try:
-    model_path = "/persistent-models/TinyLlama-1.1B-Chat-v1.0.Q4_K_M.gguf"
+    model_path = "/persistent-models/TinyLlama-1.1b-Chat-v1.0.Q4_K_M.gguf"
     if not os.path.exists(model_path):
         send_discord_log("📥 Model not found, downloading from Hugging Face...")
         model_path = hf_hub_download(
             repo_id="TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF",
-            filename="TinyLlama-1.1B-Chat-v1.0.Q4_K_M.gguf",
+            filename="tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf",
             local_dir="/persistent-models"
         )
         send_discord_log("✅ Model downloaded.")
