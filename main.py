@@ -5,6 +5,8 @@ from langchain_community.document_loaders import TextLoader
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.chains import RetrievalQA
+from langchain.chains import LLMChain
+from langchain.prompts import PromptTemplate
 from langchain_community.llms import LlamaCpp
 from pydantic import BaseModel
 from huggingface_hub import hf_hub_download
@@ -76,7 +78,8 @@ try:
         n_batch=8,
         n_gpu_layers=0,
         n_threads=4,
-        temperature=0.7
+        temperature=0.7,
+        stop=["User:", "Assistant:"]
     )
     send_discord_log("✅ LlamaCpp initialized.")
 except Exception as e:
@@ -98,6 +101,16 @@ class QueryRequest(BaseModel):
 SYSTEM_PROMPT = (
     "You are a helpful assistant. Answer concisely and only the user's query. "
     "Do not add unrelated code snippets or documentation unless asked."
+)
+
+QA_PROMPT = PromptTemplate(
+    input_variables=["context", "question"],
+    template=(
+        "Answer the question based on the context below.\n\n"
+        "Context:\n{context}\n\n"
+        "Question:\n{question}\n\n"
+        "Answer:"
+    ),
 )
 
 @app.on_event("startup")
@@ -168,7 +181,8 @@ async def ask_question(request: Request, query: QueryRequest):
             llm=llm,
             retriever=retriever,
             chain_type="stuff",
-            return_source_documents=True,
+            chain_type_kwargs={"prompt": QA_PROMPT},
+            return_source_documents=False
         )
         result = qa.invoke({"query": query.query})
         answer = result.get("result", None)
