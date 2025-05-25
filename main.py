@@ -55,12 +55,12 @@ app.add_middleware(
 send_discord_log("🚀 Starting server setup...")
 
 try:
-    model_path = "/persistent-models/mistral-3b-instruct-v0.1.Q4_K_M.gguf"
+    model_path = "/persistent-models/mistral-3b-instruct-v0.2-q2_k.gguf"
     if not os.path.exists(model_path):
         send_discord_log("📥 Model not found, downloading from Hugging Face...")
         model_path = hf_hub_download(
-            repo_id="TheBloke/Mistral-3B-Instruct-v0.1-GGUF",
-            filename="mistral-3b-instruct-v0.1.Q4_K_M.gguf",
+            repo_id="SansarK/Mistral-3B-Instruct-v0.2-Q2_K-GGUF",
+            filename="mistral-3b-instruct-v0.2-q2_k.gguf",
             local_dir="/persistent-models"
         )
         send_discord_log("✅ Model downloaded.")
