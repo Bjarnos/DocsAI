@@ -6,6 +6,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.chains import RetrievalQA
 from langchain.chains import LLMChain
+from langchain.llms.base import LLM
 from langchain.prompts import PromptTemplate
 from langchain_community.llms import LlamaCpp
 from pydantic import BaseModel
@@ -107,8 +108,9 @@ SYSTEM_PROMPT = (
 QA_PROMPT = PromptTemplate(
     input_variables=["context", "question"],
     template=(
-        "You are a helpful assistant. Answer concisely and only the user's query. "
-        "Do not add unrelated code snippets or documentation unless asked.\n\n"
+        "You are a helpful assistant. Answer concisely and only the user's question. "
+        "Shorter answers are better. "
+        "Do NOT include any code snippets, extra formatting, or unrelated information.\n\n"
         "Context:\n{context}\n\n"
         "Question:\n{question}\n\n"
         "Answer:"
@@ -177,14 +179,13 @@ async def ask_question(request: Request, query: QueryRequest):
         send_discord_log("⚠️ Tried asking but no documents indexed.")
         return {"error": "No documents indexed"}
     try:
-        qa = RetrievalQA.from_chain_type(
+        qa = RetrievalQA(
             llm=llm,
             retriever=retriever,
-            chain_type="stuff",
-            chain_type_kwargs={"prompt": QA_PROMPT},
-            return_source_documents=False
+            return_source_documents=False,
+            chain_type_kwargs={"prompt": QA_PROMPT}
         )
-        result = qa.invoke({"query": query.query})
+        result = qa.invoke({"context": "", "question": query.query})
         answer = result.get("result", None)
         send_discord_log(f"📨 Query: {query.query}\n💬 Answer: {answer}")
 
