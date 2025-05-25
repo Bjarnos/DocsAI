@@ -41,8 +41,11 @@ def cors_origin_checker(origin: str) -> bool:
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_origin_regex=r"^https://docs\.bjarnos\.dev/ai/?$",
+    allow_origins=[
+        "https://docs.bjarnos.dev",
+        "https://www.docs.bjarnos.dev",
+    ],
+    allow_origin_regex=r"^https://([a-zA-Z0-9-]+\.)?docs\.bjarnos\.dev$",
     allow_methods=["*"],
     allow_headers=["*"],
 )
