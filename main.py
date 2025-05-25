@@ -178,8 +178,7 @@ async def ask_question(request: Request, query: QueryRequest):
             chain_type="stuff",
             chain_type_kwargs={"prompt": QA_PROMPT}
         )
-        result = qa.invoke({"query": query.query})
-        answer = str(result)
+        answer = qa.invoke({"query": query.query}).get('result', 'No answer found')
         send_discord_log(f"📨 Query: {query.query}\n💬 Answer: {answer}")
 
         rate_limits[client_ip].append(time.time())
