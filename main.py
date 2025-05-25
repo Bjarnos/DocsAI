@@ -100,11 +100,6 @@ except Exception as e:
 class QueryRequest(BaseModel):
     query: str
 
-SYSTEM_PROMPT = (
-    "You are a helpful assistant. Answer concisely and only the user's query. "
-    "Do not add unrelated code snippets or documentation unless asked."
-)
-
 QA_PROMPT = PromptTemplate(
     input_variables=["context", "question"],
     template=(
